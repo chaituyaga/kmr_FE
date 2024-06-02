@@ -8,13 +8,16 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import { Typography } from "@mui/material";
+import { ListItemIcon, Typography } from "@mui/material";
 import SideNav from "./SideNav";
+import { useRouter } from "next/navigation";
+import { Logout } from "@mui/icons-material";
 
 export default function MuiAppBar() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const isMenuOpen = Boolean(anchorEl);
+  const router = useRouter();
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -22,6 +25,12 @@ export default function MuiAppBar() {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleClose = () => {
+    localStorage.setItem("user", JSON.stringify(false));
+    handleMenuClose();
+    router.push("/login");
   };
 
   const menuId = "primary-search-account-menu";
@@ -41,8 +50,12 @@ export default function MuiAppBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleClose}>
+        <ListItemIcon>
+          <Logout fontSize="small" />
+        </ListItemIcon>
+        Logout
+      </MenuItem>
     </Menu>
   );
 
@@ -87,7 +100,7 @@ export default function MuiAppBar() {
         </Box>
       </AppBar>
       {renderMenu}
-      <SideNav drawerOpen={drawerOpen} />
+      <SideNav drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} />
     </Box>
   );
 }

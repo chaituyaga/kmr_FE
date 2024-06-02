@@ -11,25 +11,36 @@ import CloseIcon from "@mui/icons-material/Close";
 import AutoCompleteMultiple from "./componenets/AutoCompleteMultiple";
 import MrtTable from "./componenets/MrtTable";
 import { useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { getAllStocks } from "./services/slices/stockSlice";
+import _ from "lodash";
 
 export default function Home() {
   const [showStocks, setShowStocks] = useState(false);
+  const [brandsData, setBrandsData] = useState([]);
+  const [typesData, setTypesData] = useState([]);
   const [data, setData] = useState([]);
+  const [filterObj, setFilterObj] = useState({});
+  const [tableOriginalData, setTableOriginalData] = useState([]);
   const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     var user = localStorage.getItem("user");
     if (!user) router.push("/login");
+    dispatch(getAllStocks()).then((res) => {
+      setData(res.payload.data.body);
+      setTableOriginalData(res.payload.data.body);
+      const brands = _.uniq(res.payload.data.body.map((i) => i.BRAND)) || [];
+      const types = _.uniq(res.payload.data.body.map((i) => i.TYPE)) || [];
+      setBrandsData(brands);
+      setTypesData(types);
+    });
   }, []);
 
   const columns = useMemo(
     () => [
-      {
-        accessorKey: "sno",
-        header: "S. No.",
-      },
       {
         accessorKey: "BRAND",
         header: "Brand",
@@ -43,12 +54,8 @@ export default function Home() {
         header: "Pack",
       },
       {
-        accessorKey: "packsQuantity",
-        header: "Packs Quantity",
-      },
-      {
-        accessorKey: "freeQty",
-        header: "Free Quantity",
+        accessorKey: "QUANTITY",
+        header: "Available Quantity",
       },
       {
         accessorKey: "MRP",
@@ -62,8 +69,25 @@ export default function Home() {
     []
   );
 
+  const onChange = (value, type) => {
+    let obj = _.cloneDeep(filterObj);
+    obj[type] = value;
+    if (!obj[type].length) delete obj[type];
+    let filteredData = _.filter(tableOriginalData, (o) =>
+      _.every(obj, (value, key) => {
+        if (Array.isArray(value)) {
+          return value.includes(o[key]);
+        } else {
+          return o[key] === value;
+        }
+      })
+    );
+    setData(filteredData);
+    setFilterObj(obj);
+  };
+
   return (
-    <main>
+    <Box className="mainApp">
       <Button
         color="success"
         variant="contained"
@@ -93,13 +117,15 @@ export default function Home() {
             <Box sx={{ display: { xs: "block", md: "flex", lg: "flex" } }}>
               <AutoCompleteMultiple
                 placeholder="Select Brands"
-                options={[]}
+                options={brandsData}
                 inputLabel="Brands..."
+                onChange={(e, value) => onChange(value, "BRAND")}
               />
               <AutoCompleteMultiple
                 placeholder="Select Types"
-                options={[]}
+                options={typesData}
                 inputLabel="Types..."
+                onChange={(e, value) => onChange(value, "TYPE")}
               />
             </Box>
             <Box>
@@ -108,6 +134,6 @@ export default function Home() {
           </DialogContent>
         </Dialog>
       )}
-    </main>
+    </Box>
   );
 }

@@ -217,28 +217,8 @@ export default function Login() {
                 sx={{ mt: 3, textAlign: "center", pl: 6, pr: 6 }}
                 color="success"
               >
-                {userSignUp ? "Sign Up" : "Continue to Sign-in..."}
+                {"Continue to Sign-in..."}
               </Button>
-            )}
-            {!userSignUp && (
-              <Box>
-                <Link
-                  sx={{
-                    textDecoration: "none",
-                    fontWeight: "bold",
-                    position: "absolute",
-                    left: 40,
-                    cursor: "pointer",
-                  }}
-                  onClick={() => {
-                    setMailInp("");
-                    setUserSignUp(true);
-                    setMailInpPage(false);
-                  }}
-                >
-                  Want to create an Account
-                </Link>
-              </Box>
             )}
           </Box>
         </form>

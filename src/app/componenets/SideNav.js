@@ -13,20 +13,25 @@ import MailIcon from "@mui/icons-material/Mail";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
+import { useRouter } from "next/navigation";
 
 export default function SideNav(props) {
+  const router = useRouter();
   const sideNavData = [
     {
       name: "Stock Inward",
       icon: ArchiveIcon,
+      key: "si",
     },
     {
       name: "Stock Outward",
       icon: UnarchiveIcon,
+      key: "so",
     },
     {
       name: "Sales Margin",
       icon: ShowChartIcon,
+      key: "sm",
     },
   ];
   return (
@@ -47,7 +52,12 @@ export default function SideNav(props) {
         <List>
           {sideNavData.map((text, index) => (
             <ListItem key={text.name} disablePadding>
-              <ListItemButton>
+              <ListItemButton
+                onClick={() => {
+                  router.push(text.key);
+                  props.setDrawerOpen(!props.drawerOpen);
+                }}
+              >
                 <ListItemIcon>
                   <text.icon />
                 </ListItemIcon>

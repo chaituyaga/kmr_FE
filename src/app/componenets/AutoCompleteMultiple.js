@@ -1,23 +1,18 @@
 import { Autocomplete, Checkbox, TextField } from "@mui/material";
 
 export default function AutoCompleteMultiple(props) {
-  const { options, placeholder, inputLabel } = props;
+  const { options, placeholder, inputLabel, onChange } = props;
   return (
     <Autocomplete
       multiple
       id="checkboxes-tags-demo"
       options={options}
-      disableCloseOnSelect
-      getOptionLabel={(option) => `Show All ${option.title} Data`}
+      onChange={onChange}
+      getOptionLabel={(option) => `Show All ${option} Data`}
       renderOption={(props, option, { selected }) => (
         <li {...props}>
-          <Checkbox
-            icon={icon}
-            checkedIcon={checkedIcon}
-            style={{ marginRight: 8 }}
-            checked={selected}
-          />
-          {option.title}
+          <Checkbox style={{ marginRight: 8 }} checked={selected} />
+          {option}
         </li>
       )}
       style={{

@@ -16,6 +16,7 @@ export default function MrtTable(props) {
     enableColumnResizing: true,
     enableFullScreenToggle: false,
     enableDensityToggle: false,
+    enableBottomToolbar: false,
     initialState: {
       density: "compact",
     },
