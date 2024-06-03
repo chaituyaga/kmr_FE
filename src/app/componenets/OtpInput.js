@@ -48,7 +48,7 @@ const OtpInput = (props) => {
         return (
           <Input
             key={index}
-            type="text"
+            type="number"
             ref={(input) => (inputRefs.current[index] = input)}
             value={value}
             onChange={(e) => handleChange(index, e)}
