@@ -28,6 +28,7 @@ import {
   addCustomer,
   getAllCustomers,
   getAllStocks,
+  updateStocks,
 } from "../services/slices/stockSlice";
 import {
   MRT_EditActionButtons,
@@ -56,6 +57,10 @@ export default function FreeSoloCreateOptionDialog() {
 
   useEffect(() => {
     fetchCustomers();
+    fetchStocksData();
+  }, []);
+
+  const fetchStocksData = () => {
     dispatch(getAllStocks()).then((res) => {
       let results = res.payload.data.body;
       setStocksData(results);
@@ -68,7 +73,7 @@ export default function FreeSoloCreateOptionDialog() {
         PACK: packs,
       });
     });
-  }, []);
+  };
 
   const fetchCustomers = () => {
     dispatch(getAllCustomers())
@@ -284,7 +289,6 @@ export default function FreeSoloCreateOptionDialog() {
             i.PACK === value
         )
         .map((o) => o);
-      console.log(resData);
       let qty = 0;
       resData.forEach((i) => (qty = qty + Number(i.QUANTITY)));
       obj["qty"] = qty;
@@ -296,15 +300,48 @@ export default function FreeSoloCreateOptionDialog() {
   };
 
   const handleSaveAndClose = () => {
-    console.log(tableData);
-    if (!tableData.length) {
+    if (!data.length) {
       alert("No Data Entered");
     } else {
-      let obj = {
-        SUPPLIER_NAME: value,
-        INVOICE_NUMBER: invNumInp,
-        DATA: tableData,
-      };
+      const grpdData = _.chain(stocksData)
+        .groupBy("SUPPLIER_NAME")
+        .map((i) => ({
+          SUPPLIER_NAME: i[0].SUPPLIER_NAME,
+          INVOICE_NUMBER: i[0].INVOICE_NUMBER,
+          DATA: i.map(({ order, ...o }) => o),
+        }))
+        .value();
+      let BEARR = [];
+
+      grpdData.forEach((i) => {
+        i.DATA.forEach((o) => {
+          data.forEach((e) => {
+            if (
+              e.BRAND === o.BRAND &&
+              e.TYPE === o.TYPE &&
+              e.PACK === o.PACK &&
+              e.QUANTITY <= o.QUANTITY
+            ) {
+              o.QUANTITY = (Number(o.QUANTITY) - Number(e.QUANTITY)).toString();
+              BEARR.push(i);
+            }
+          });
+        });
+        i.DATA = i.DATA.filter((o) => o.QUANTITY != 0);
+      });
+
+      BEARR.forEach((i) => {
+        grpdData.forEach((o) => {
+          if (o.INVOICE_NUMBER === i.INVOICE_NUMBER) i.DATA = o.DATA;
+          i.DATA.forEach((e) => {
+            delete e.SUPPLIER_NAME;
+            delete e.INVOICE_NUMBER;
+          });
+        });
+      });
+      dispatch(updateStocks(BEARR)).then((res) => {
+        router.push("/");
+      });
     }
   };
 
@@ -387,11 +424,11 @@ export default function FreeSoloCreateOptionDialog() {
           <MaterialReactTable table={table} />
           <Box>
             <BottomNavigation showLabels>
-              <BottomNavigationAction
+              {/* <BottomNavigationAction
                 label="Save & Print"
                 icon={<Print />}
                 onClick={handleSaveAndClose}
-              />
+              /> */}
               <BottomNavigationAction
                 label="Save & Close"
                 icon={<Save />}

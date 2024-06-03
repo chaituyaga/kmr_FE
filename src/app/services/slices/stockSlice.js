@@ -47,6 +47,13 @@ export const addStocks = createAsyncThunk(
   }
 );
 
+export const updateStocks = createAsyncThunk(
+  "stocks/updateStocks",
+  async (data, thunkAPI) => {
+    return ApiClient.post("updateStocks", data);
+  }
+);
+
 export const stockSlice = createSlice({
   name: "stocks",
   initialState,

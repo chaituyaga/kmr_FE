@@ -28,11 +28,6 @@ export default function SideNav(props) {
       icon: UnarchiveIcon,
       key: "so",
     },
-    {
-      name: "Sales Margin",
-      icon: ShowChartIcon,
-      key: "sm",
-    },
   ];
   return (
     <Drawer
